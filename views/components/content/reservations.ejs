@@ -5,17 +5,7 @@
 					<div class="col-md-6 animate-box">
 					<h3>Reserva de mesa</h3>
                     <form action="/reservations" method="POST">
-                    <% if(typeof err === "string") {%>
-                        <div class="alert alert-danger">
-                            <%= err %>
-                        </div>
-                        <% } %>
-
-                    <% if(typeof success === "string") {%>
-                        <div class="alert alert-success">
-                            <%= success %>
-                        </div>
-                        <% } %>
+                    	<%- include("alert") -%>
                         <div class="row form-group">
                             <div class="col-md-12">
                                 <label for="inputName">Nome</label>
