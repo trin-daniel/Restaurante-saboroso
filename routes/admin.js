@@ -1,6 +1,9 @@
 const express = require('express');
+const moment = require('moment-js/moment');
 const users = require('../includes/users');
 const admin = require('../includes/admin');
+const menus = require('../includes/menus');
+const reservations = require('../includes/reservations');
 
 const router = express.Router();
 router.use((req, res, next) => {
@@ -22,7 +25,18 @@ router.get('/logout', (req, res, next) => {
 });
 
 router.get('/', (req, res) => {
-  res.render('admin/index', { menus: req.menus });
+  admin
+    .dahsboardCount()
+    .then((response) => {
+      res.render('admin/index', {
+        menus: req.menus,
+        user: req.session.user,
+        data: response,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 router.post('/login', (req, res) => {
@@ -64,20 +78,84 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/contacts', (req, res) => {
-  res.render('admin/contacts', { menus: req.menus });
+  res.render('admin/contacts', { menus: req.menus, user: req.session.user });
 });
 
 router.get('/emails', (req, res) => {
-  res.render('admin/emails', { menus: req.menus });
+  res.render('admin/emails', { menus: req.menus, user: req.session.user });
 });
 router.get('/menus', (req, res) => {
-  res.render('admin/menus', { menus: req.menus });
+  menus.getMenus().then((data) => {
+    res.render('admin/menus', {
+      menus: req.menus,
+      user: req.session.user,
+      data,
+    });
+  });
 });
+
+router.post('/menus', (req, res, next) => {
+  const { fields } = req;
+  const { files } = req;
+  menus
+    .save(fields, files)
+    .then((response) => {
+      res.send(response);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
+router.delete('/menus/:id', (req, res, next) => {
+  menus
+    .delete(req.params.id)
+    .then((response) => {
+      res.send(response);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
 router.get('/reservations', (req, res) => {
-  res.render('admin/reservations', { date: {}, menus: req.menus });
+  reservations.getReservations().then((data) => {
+    res.render('admin/reservations', {
+      date: {},
+      data,
+      menus: req.menus,
+      user: req.session.user,
+      moment,
+    });
+  });
 });
+
+router.post('/reservations', (req, res, next) => {
+  const { fields } = req;
+  const { files } = req;
+  reservations
+    .save(fields, files)
+    .then((response) => {
+      res.send(response);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
+router.delete('/reservations/:id', (req, res, next) => {
+  reservations
+    .delete(req.params.id)
+    .then((response) => {
+      res.send(response);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
 router.get('/users', (req, res) => {
-  res.render('admin/users', { menus: req.menus });
+  res.render('admin/users', { menus: req.menus, user: req.session.user });
 });
 
 module.exports = router;

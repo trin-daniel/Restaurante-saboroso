@@ -19,6 +19,9 @@
     "rules": {
         "prettier/prettier": "error",
         "indent":"off",
-        "object-curly-newline":"off"
+        "object-curly-newline":"off",
+        "radix":"off",
+        "prefer-const":"off",
+        "no-param-reassign": "off"
     }
 }

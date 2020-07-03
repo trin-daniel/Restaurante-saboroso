@@ -11,11 +11,27 @@ const dbRedis = require('redis');
 
 const client = dbRedis.createClient();
 
+const formidable = require('formidable');
 const indexRouter = require('./routes/index');
 const adminRouter = require('./routes/admin');
 
 const app = express();
-
+app.use((req, res, next) => {
+  if (req.method === 'POST') {
+    const form = formidable.IncomingForm({
+      uploadDir: path.join(__dirname, '/public/images'),
+      keepExtensions: true,
+    });
+    form.parse(req, (err, fields, files) => {
+      req.body = fields;
+      req.fields = fields;
+      req.files = files;
+      next();
+    });
+  } else {
+    next();
+  }
+});
 app.use(
   session({
     store: new Redis({
@@ -35,7 +51,6 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
