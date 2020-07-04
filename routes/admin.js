@@ -3,6 +3,7 @@ const moment = require('moment-js/moment');
 const users = require('../includes/users');
 const admin = require('../includes/admin');
 const menus = require('../includes/menus');
+const contacts = require('../includes/contacts');
 const reservations = require('../includes/reservations');
 
 const router = express.Router();
@@ -78,12 +79,31 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/contacts', (req, res) => {
-  res.render('admin/contacts', { menus: req.menus, user: req.session.user });
+  contacts
+    .getContacts()
+    .then((data) => {
+      res.render('admin/contacts', {
+        menus: req.menus,
+        user: req.session.user,
+        data,
+      });
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
-router.get('/emails', (req, res) => {
-  res.render('admin/emails', { menus: req.menus, user: req.session.user });
+router.delete('/contacts/:id', (req, res) => {
+  contacts
+    .delete(req.params.id)
+    .then((response) => {
+      res.send(response);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
+
 router.get('/menus', (req, res) => {
   menus.getMenus().then((data) => {
     res.render('admin/menus', {
@@ -155,7 +175,34 @@ router.delete('/reservations/:id', (req, res, next) => {
 });
 
 router.get('/users', (req, res) => {
-  res.render('admin/users', { menus: req.menus, user: req.session.user });
+  users.getUsers().then((data) => {
+    res.render('admin/users', {
+      menus: req.menus,
+      user: req.session.user,
+      data,
+    });
+  });
 });
 
+router.post('/users', (req, res) => {
+  users
+    .save(req.body)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+router.delete('/users/:id', (req, res) => {
+  users
+    .delete(req.params.id)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+  // res.render('admin/users', { menus: req.menus, user: req.session.user });
+});
 module.exports = router;

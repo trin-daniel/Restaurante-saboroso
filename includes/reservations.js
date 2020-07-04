@@ -8,7 +8,7 @@ module.exports = {
         let date = body.date.split('/').reverse().join('-');
         body.date = date;
       }
-      const params = [name, email, people, body.date, time];
+      let params = [name, email, people, body.date, time];
       let query;
       if (parseInt(body.id) > 0) {
         query = `
@@ -27,11 +27,12 @@ module.exports = {
         (name, email, people, date, time) 
         VALUES(?, ?, ?, ?, ?)`;
       }
-      conn.query(query, params, (err) => {
+      conn.query(query, params, (err, result) => {
         if (err) {
           reject(err);
         } else {
-          resolve('Sucesso na reserva');
+          // const msg = 'Sucesso na reserva';
+          resolve(result);
         }
       });
     });
@@ -45,6 +46,21 @@ module.exports = {
             reject(err);
           } else {
             resolve(result);
+          }
+        },
+      );
+    });
+  },
+  delete(id) {
+    return new Promise((resolve, reject) => {
+      conn.query(
+        'DELETE FROM  tb_reservations WHERE id=?',
+        [id],
+        (err, results) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results);
           }
         },
       );

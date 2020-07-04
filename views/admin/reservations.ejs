@@ -70,10 +70,9 @@
               <td><%= row.name%></td>
               <td><%= row.email%></td>
               <td><%= row.people%></td>
-              <td><%= moment(row.date).format("DD.MM.YYYY") %></td>
+              <td><%= moment(row.date).format("DD-MM-YYYY") %></td>
               <td><%= row.time%></td>
-              <td><button type="button" class="btn btn-xs btn-info btn-update" data-toggle="modal"
-                  data-target="#modal-update"><i class="fa fa-pencil"></i> Editar</button>&nbsp;<button type="button"
+              <td><button type="button" class="btn btn-xs btn-info btn-update" ><i class="fa fa-pencil"></i> Editar</button>&nbsp;<button type="button"
                   class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash"></i> Excluir</button></td>
             </tr>
             <% }) %>
@@ -202,23 +201,30 @@
 <%- include('components/footer') -%>
 <script src="/js/formSave.js"></script>
 <script src="/js/moment.min.js"></script>
+<script src="/js/Grid.js"></script>
 <script>
-  const formCreate = document.querySelector('#modal-create form');
-  formCreate.save()
-    .then(json => {
-      window.location.reload();
-    })
-    .catch(err => {
-      console.error(err)
-    });
-    
-    const formUpdate = document.querySelector('#modal-update form');
-    formUpdate.save()
-    .then(json =>{
-      window.location.reload();
-    })
-    .catch(err=>{
-      console.error(err)
-    });
+
+  new Grid({
+   formCreate: '#modal-create form',
+   formUpdate: '#modal-update form',
+   buttonUpdate: '.btn-update',
+   buttonDelete: '.btn-delete',
+   deleteURL: '/admin/reservations/${data.id}',
+   deleteMessage: 'Deseja realmente apagar a reserva de ${data.name}',
+    onUpdateLoad: (formUpdate, name, data)=>{ 
+      const input = formUpdate.querySelector(`[name=${name}]`);
+      switch (name) {
+        case 'date':
+          if (input) {
+            input.value = moment(data[name]).format('YYYY-MM-DD');
+          }
+        break;
+        default:
+          if (input) {
+            input.value = data[name];
+          }
+      }
+    }
+  });
 
 </script>
